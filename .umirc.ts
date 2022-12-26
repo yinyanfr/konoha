@@ -2,7 +2,12 @@ import { defineConfig } from "umi";
 
 export default defineConfig({
   npmClient: "npm",
-  plugins: ["@umijs/plugins/dist/locale"],
+  plugins: [
+    "@umijs/plugins/dist/locale",
+    "@umijs/plugins/dist/antd",
+    "@umijs/plugins/dist/initial-state",
+    "@umijs/plugins/dist/model",
+  ],
   locale: {
     antd: true,
     baseNavigator: true,
@@ -11,6 +16,9 @@ export default defineConfig({
     title: false,
     useLocalStorage: true,
   },
+  antd: {},
+  initialState: {},
+  model: {},
   title: "Boating",
   favicons: ["favicon.ico"],
   metas: [

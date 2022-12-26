@@ -25,6 +25,8 @@ import dayjs from "dayjs";
 import type { RcFile } from "antd/es/upload";
 import shortUUID from "short-uuid";
 import sanitize from "sanitize-filename";
+import apiAuthHeader from "./keys.json";
+import axios from "axios";
 
 const uuid = shortUUID();
 
@@ -73,4 +75,46 @@ export async function getFileUrls(filenames: string[] = []) {
   );
   const res = await Promise.allSettled(reqs);
   return res.map((e) => (e.status === "fulfilled" ? e.value : null));
+}
+
+async function requestWordScore(word: string) {
+  const options = {
+    method: "GET",
+    url: "https://twinword-language-scoring.p.rapidapi.com/word/",
+    params: { entry: word },
+    headers: {
+      ...apiAuthHeader,
+    },
+  };
+
+  const res = await axios.request(options);
+  return res.data;
+}
+
+export async function getWord(word: string) {
+  const localData = localStorage.getItem(`word-${word}`);
+  if (localData) return JSON.parse(localData);
+  const wordRef = doc(db, "words", word);
+  const wordSnap = await getDoc(wordRef);
+  if (wordSnap.exists()) {
+    return wordSnap.data();
+  }
+
+  const data = await requestWordScore(word);
+  const result = { level: data.ten_degree ?? 0 };
+
+  localStorage.setItem(`word-${word}`, JSON.stringify(result));
+  await setWord(word, result);
+
+  if (word !== data.response) {
+    localStorage.setItem(`word-${data.response}`, JSON.stringify(result));
+    await setWord(data.response, result);
+  }
+
+  return result;
+}
+
+export async function setWord(word: string, payload: Word) {
+  const wordRef = doc(db, "words", word);
+  await setDoc(wordRef, payload, { merge: true });
 }
