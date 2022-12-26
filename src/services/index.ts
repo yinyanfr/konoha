@@ -96,19 +96,23 @@ export async function getWord(word: string) {
   if (localData) return JSON.parse(localData);
   const wordRef = doc(db, "words", word);
   const wordSnap = await getDoc(wordRef);
-  if (wordSnap.exists()) {
-    return wordSnap.data();
-  }
 
-  const data = await requestWordScore(word);
-  const result = { level: data.ten_degree ?? 0 };
+  let result: Record<string, any> = {};
+  let lemmetized: string = word;
+  if (wordSnap.exists()) {
+    result = wordSnap.data();
+  } else {
+    const data = await requestWordScore(word);
+    result = { level: data.ten_degree ?? 0 };
+    lemmetized = data.response;
+  }
 
   localStorage.setItem(`word-${word}`, JSON.stringify(result));
   await setWord(word, result);
 
-  if (word !== data.response) {
-    localStorage.setItem(`word-${data.response}`, JSON.stringify(result));
-    await setWord(data.response, result);
+  if (word !== lemmetized) {
+    localStorage.setItem(`word-${lemmetized}`, JSON.stringify(result));
+    await setWord(lemmetized, result);
   }
 
   return result;

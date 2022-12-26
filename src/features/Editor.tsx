@@ -10,11 +10,7 @@ interface EditorProps {
 const Editor: FC<EditorProps> = ({ value, onChange }) => {
   return (
     <div className={styles.mdcontainer}>
-      <MDEditor
-        preview="edit"
-        value={value}
-        // onChange={onChange}
-      />
+      <MDEditor preview="edit" value={value} onChange={onChange} />
     </div>
   );
 };

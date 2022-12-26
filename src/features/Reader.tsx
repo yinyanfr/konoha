@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 import { useEffect, useState, useId } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -36,7 +36,7 @@ const Reader: FC<ReaderProps> = ({ content }) => {
       const words: Record<string, Word> = {};
       const wordlist = content
         .split(/[ \n]+/g)
-        .map((e) => e.replace(/[^A-z]/g, ""))
+        .map((e) => e.replace(/[^A-z-]/g, ""))
         .filter((e) => e.length > 3)
         .map((e) => e.toLocaleLowerCase());
       const uniqList = uniq(wordlist);
@@ -55,14 +55,20 @@ const Reader: FC<ReaderProps> = ({ content }) => {
 
   return (
     <Spin spinning={loading}>
-      <Slider
-        marks={marks}
-        step={null}
-        value={level}
-        onChange={(value) => {
-          setLevel(value);
-        }}
-      />
+      <div className="flex">
+        <Slider
+          marks={marks}
+          step={null}
+          tooltip={{ open: false }}
+          style={{
+            width: "85%",
+          }}
+          value={level}
+          onChange={(value) => {
+            setLevel(value);
+          }}
+        />
+      </div>
       <Divider />
       <ReactMarkdown
         rehypePlugins={[rehypeRaw, rehypeKatex]}
@@ -73,28 +79,36 @@ const Reader: FC<ReaderProps> = ({ content }) => {
         }}
         components={{
           p({ node, className, children, ...props }) {
-            let wordlist: string[] = [];
+            let wordlist: ReactNode[] = [];
             if (Array.isArray(children)) {
-              wordlist = (children?.[0] as string)
-                ?.split(/ +/g)
-                ?.map((e) => e.replace(/[^A-z]/g, ""));
+              children.forEach((e) => {
+                if (typeof e === "string" || e instanceof String) {
+                  wordlist = wordlist.concat(e.split(/ +/g));
+                } else {
+                  wordlist = wordlist.concat(e?.toLocaleString()?.split(/ +/g));
+                }
+              });
             }
             return (
               <p {...props}>
                 {wordlist?.length
                   ? wordlist.map((e, i) => {
-                      const match = dict[e.toLocaleLowerCase()];
-                      const willTranslate =
-                        match?.level && match.level > parseLevel(level);
+                      if (typeof e === "string" || e instanceof String) {
+                        const match =
+                          dict[e.toLocaleLowerCase().replace(/[^A-z-]/g, "")];
+                        const willTranslate =
+                          match?.level && match.level > parseLevel(level);
 
-                      return (
-                        <span key={`${id}-${e}-${i}`}>
-                          <>
-                            {e}
-                            {willTranslate ? `(${match?.level})` : ""}{" "}
-                          </>
-                        </span>
-                      );
+                        return (
+                          <span key={`${id}-${e}-${i}`}>
+                            <>
+                              {e}
+                              {willTranslate ? `(${match?.level})` : ""}{" "}
+                            </>
+                          </span>
+                        );
+                      }
+                      return e;
                     })
                   : children}
               </p>
