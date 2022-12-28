@@ -91,7 +91,7 @@ async function requestWordScore(word: string) {
   return res.data;
 }
 
-async function requestWord(word: string) {
+export async function requestWord(word: string): Promise<{ data: Dict }> {
   const res = await axios.get(`https://boating.yinyan.fr/word?entry=${word}`);
   return res.data;
 }

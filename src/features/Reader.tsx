@@ -6,7 +6,7 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { useModel } from "umi";
+import { useIntl, useModel } from "umi";
 import { uniq } from "lodash";
 import { Divider, Segmented, Spin } from "antd";
 import { getWord } from "@/services";
@@ -18,10 +18,10 @@ interface ReaderProps {
 
 const Reader: FC<ReaderProps> = ({ content }) => {
   const id = useId();
+  const intl = useIntl();
   const { dict, setDict } = useModel("dict");
   const { level, setLevel } = useModel("level");
   const [loading, setLoading] = useState(false);
-  console.log(dict);
 
   useEffect(() => {
     if (content?.length) {
@@ -50,13 +50,10 @@ const Reader: FC<ReaderProps> = ({ content }) => {
     <Spin spinning={loading}>
       <div className="flex">
         <Segmented
-          options={[
-            { label: "Don't Translate", value: 10 },
-            { label: "Advanced", value: 6 },
-            { label: "Intermediate", value: 4 },
-            { label: "Beginner", value: 2 },
-            { label: "All", value: 0 },
-          ]}
+          options={[10, 6, 4, 2, 0].map((e) => ({
+            value: e,
+            label: intl.formatMessage({ id: `level.${e}` }),
+          }))}
           value={level}
           onChange={(value) => {
             console.log(value);

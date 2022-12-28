@@ -5,24 +5,27 @@ import { Footer } from "@/components";
 
 export default function Layout() {
   return (
-    <div className={styles.navs}>
-      <ul>
-        <li>Konoha</li>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/example">Example</Link>
-        </li>
-        <li>
-          <Link to="/dict">Dictionary</Link>
-        </li>
-        <li>
-          <a href="https://github.com/yinyanfr/konoha">
-            <GithubOutlined /> Github
-          </a>
-        </li>
-      </ul>
+    <div>
+      <nav className={styles.navs}>
+        <ul>
+          <li>Konoha</li>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/example">Example</Link>
+          </li>
+          <li>
+            <Link to="/dict">Dictionary</Link>
+          </li>
+          <li>
+            <a href="https://github.com/yinyanfr/konoha">
+              <GithubOutlined /> Github
+            </a>
+          </li>
+        </ul>
+      </nav>
+
       <Outlet />
 
       <Footer />
