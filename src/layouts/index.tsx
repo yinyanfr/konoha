@@ -1,7 +1,7 @@
 import { Link, Outlet } from "umi";
 import styles from "./index.less";
-import { GithubOutlined } from "@ant-design/icons";
-import { Footer } from "@/components";
+import { Footer, SetLang } from "@/components";
+import Darkreader from "react-darkreader";
 
 export default function Layout() {
   return (
@@ -19,9 +19,10 @@ export default function Layout() {
             <Link to="/dict">Dictionary</Link>
           </li>
           <li>
-            <a href="https://github.com/yinyanfr/konoha">
-              <GithubOutlined /> Github
-            </a>
+            <Darkreader />
+          </li>
+          <li>
+            <SetLang />
           </li>
         </ul>
       </nav>

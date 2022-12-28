@@ -43,6 +43,8 @@ const Dictionary: FC<DictionaryProps> = ({ dict }) => {
         </p>
       ) : null}
 
+      <Divider />
+
       <WordVariations exchange={dict?.exchange} />
 
       <Divider />
