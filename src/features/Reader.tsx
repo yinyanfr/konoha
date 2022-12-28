@@ -8,27 +8,20 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { useModel } from "umi";
 import { uniq } from "lodash";
-import { Divider, Slider, Spin } from "antd";
+import { Divider, Segmented, Spin } from "antd";
 import { getWord } from "@/services";
-import { parseLevel } from "@/lib";
+import { ShortTranslation } from "@/components";
 
 interface ReaderProps {
   content: string;
 }
-
-const marks = {
-  0: "Don't translate",
-  25: "Advanced",
-  50: "Intermediate",
-  75: "Beginner",
-  100: "Everything",
-};
 
 const Reader: FC<ReaderProps> = ({ content }) => {
   const id = useId();
   const { dict, setDict } = useModel("dict");
   const { level, setLevel } = useModel("level");
   const [loading, setLoading] = useState(false);
+  console.log(dict);
 
   useEffect(() => {
     if (content?.length) {
@@ -56,16 +49,18 @@ const Reader: FC<ReaderProps> = ({ content }) => {
   return (
     <Spin spinning={loading}>
       <div className="flex">
-        <Slider
-          marks={marks}
-          step={null}
-          tooltip={{ open: false }}
-          style={{
-            width: "85%",
-          }}
+        <Segmented
+          options={[
+            { label: "Don't Translate", value: 10 },
+            { label: "Advanced", value: 6 },
+            { label: "Intermediate", value: 4 },
+            { label: "Beginner", value: 2 },
+            { label: "All", value: 0 },
+          ]}
           value={level}
           onChange={(value) => {
-            setLevel(value);
+            console.log(value);
+            setLevel(value as number);
           }}
         />
       </div>
@@ -85,7 +80,7 @@ const Reader: FC<ReaderProps> = ({ content }) => {
                 if (typeof e === "string" || e instanceof String) {
                   wordlist = wordlist.concat(e.split(/ +/g));
                 } else {
-                  wordlist = wordlist.concat(e?.toLocaleString()?.split(/ +/g));
+                  // wordlist = wordlist.concat(e?.toLocaleString()?.split(/ +/g));
                 }
               });
             }
@@ -97,13 +92,19 @@ const Reader: FC<ReaderProps> = ({ content }) => {
                         const match =
                           dict[e.toLocaleLowerCase().replace(/[^A-z-]/g, "")];
                         const willTranslate =
-                          match?.level && match.level > parseLevel(level);
+                          match?.level && match.level > level;
 
                         return (
                           <span key={`${id}-${e}-${i}`}>
                             <>
                               {e}
-                              {willTranslate ? `(${match?.level})` : ""}{" "}
+                              {willTranslate ? (
+                                <ShortTranslation
+                                  translation={match?.data?.translation}
+                                />
+                              ) : (
+                                ""
+                              )}{" "}
                             </>
                           </span>
                         );

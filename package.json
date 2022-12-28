@@ -13,6 +13,7 @@
     "@ant-design/pro-components": "^2.3.47",
     "@uiw/react-md-editor": "^3.20.1",
     "@umijs/plugins": "^4.0.40",
+    "ahooks": "^3.7.4",
     "antd": "^5.1.1",
     "axios": "^1.2.1",
     "dayjs": "^1.11.7",

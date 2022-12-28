@@ -91,6 +91,11 @@ async function requestWordScore(word: string) {
   return res.data;
 }
 
+async function requestWord(word: string) {
+  const res = await axios.get(`https://boating.yinyan.fr/word?entry=${word}`);
+  return res.data;
+}
+
 export async function getWord(word: string) {
   const localData = localStorage.getItem(`word-${word}`);
   if (localData) return JSON.parse(localData);
@@ -99,20 +104,26 @@ export async function getWord(word: string) {
 
   let result: Record<string, any> = {};
   let lemmetized: string = word;
-  if (wordSnap.exists()) {
+  const exists = wordSnap.exists();
+  if (exists) {
     result = wordSnap.data();
   } else {
     const data = await requestWordScore(word);
-    result = { level: data.ten_degree ?? 0 };
+    const dict = await requestWord(word);
+    result = { ...dict, level: data.ten_degree ?? 0 };
     lemmetized = data.response;
   }
 
   localStorage.setItem(`word-${word}`, JSON.stringify(result));
-  await setWord(word, result);
+  if (!exists) {
+    await setWord(word, result);
+  }
 
   if (word !== lemmetized) {
     localStorage.setItem(`word-${lemmetized}`, JSON.stringify(result));
-    await setWord(lemmetized, result);
+    if (!exists) {
+      await setWord(lemmetized, result);
+    }
   }
 
   return result;
